@@ -86,6 +86,8 @@ public class BoardLogic {
     	String[][] boardList = board.getBoardList();
     	
         boardList[rowNo][columnNo] = discColor;
+        
+        board.setBoardList(boardList);
     }
 
     /**

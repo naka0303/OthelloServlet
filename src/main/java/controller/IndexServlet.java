@@ -28,8 +28,10 @@ public class IndexServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	    RequestDispatcher dispatcher = request.getRequestDispatcher("view/index.jsp");
-
+		log("=== IndexServlet doGet ===");
+		log("forward to index.jsp");
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher("view/index.jsp");
 	    dispatcher.forward(request, response);
 	}
 

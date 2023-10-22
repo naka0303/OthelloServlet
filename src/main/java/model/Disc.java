@@ -4,12 +4,6 @@ public class Disc {
 	private int blackNum;
     private int whiteNum;
     
- // public Disc(Integer blackNum, Integer whiteNum) {
-    //     this.blackNum = blackNum;
-    //     this.whiteNum = whiteNum;
-    // }
-    
-    // getter/setter
 	public int getBlackNum() {
 		return blackNum;
 	}

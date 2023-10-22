@@ -7,11 +7,12 @@ public class DiscLogic {
     public void calcDiscNum(Disc disc, String[][] boardList) {
         int blackCnt = 0;
         int whiteCnt = 0;
-        for (String[] rowNoColumnNo : boardList) {
-            for (String var : rowNoColumnNo) {
-                if (var == "B") {
+        
+        for (String[] row : boardList) {
+            for (String column : row) {
+                if (column == "B") {
                     blackCnt++;
-                } else if (var == "W") {
+                } else if (column == "W") {
                     whiteCnt++;
                 }
             }
@@ -19,5 +20,4 @@ public class DiscLogic {
         disc.setBlackNum(blackCnt);
         disc.setWhiteNum(whiteCnt);
     }
-
 }

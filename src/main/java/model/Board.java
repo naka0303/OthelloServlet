@@ -29,7 +29,13 @@ public class Board {
      * コマ配置判定フラグ
      */
     private boolean emptyFlg = false;
-
+    
+    /**
+     * 配置コマ行列番号
+     */
+    private String rowNoSet;
+    private String columnNoSet;
+    
     /**
      * 盤外判定フラグ
      * 
@@ -91,6 +97,22 @@ public class Board {
 
 	public void setEmptyFlg(boolean emptyFlg) {
 		this.emptyFlg = emptyFlg;
+	}
+	
+	public String getRowNoSet() {
+		return rowNoSet;
+	}
+	
+	public void setRowNoSet(String rowNoSet) {
+		this.rowNoSet = rowNoSet;
+	}
+	
+	public String getColumnNoSet() {
+		return columnNoSet;
+	}
+	
+	public void setColumnNoSet(String columnNoSet) {
+		this.columnNoSet = columnNoSet;
 	}
 
 	public boolean isBoardOutsideFlg() {

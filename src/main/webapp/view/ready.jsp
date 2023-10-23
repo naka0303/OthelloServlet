@@ -1,11 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" import="model.Player"%>
 <%
 // セッションからのデータの取得
-String player1Name = (String) session.getAttribute("player1Name");
-String player2Name = (String) session.getAttribute("player2Name");
-String player1Disc = (String) session.getAttribute("player1Disc");
-String player2Disc = (String) session.getAttribute("player2Disc");
+Player player1 = (Player) session.getAttribute("player1");
+Player player2 = (Player) session.getAttribute("player2");
 %>
 <!DOCTYPE html>
 <html>
@@ -14,8 +12,8 @@ String player2Disc = (String) session.getAttribute("player2Disc");
 		<title>オセロゲーム</title>
 	</head>
 	<body>
-		<p><%= player1Name %>さんのコマは"<%= player1Disc %>"です。</p>
-		<p><%= player2Name %>さんのコマは"<%= player2Disc %>"です。</p>
+		<p><%= player1.getPlayerName() %>さんのコマは"<%= player1.getDiscColor() %>"です。</p>
+		<p><%= player2.getPlayerName() %>さんのコマは"<%= player2.getDiscColor() %>"です。</p>
 		<p>準備ができたら「ゲーム開始」を押下してください。</p>
 		<form action="<%= request.getContextPath() %>/main" method="post">
 			<input type="submit" value="ゲーム開始">

@@ -52,38 +52,41 @@ public class MainServlet extends HttpServlet {
 		Player player1 = (Player) session.getAttribute("player1");
 		Player player2 = (Player) session.getAttribute("player2");
 		PlayerLogic playerLogic = (PlayerLogic) session.getAttribute("playerLogic");
-			
+		
 		// セッション保持判定
-		if (disc == null
-			|| discLogic == null
-			|| board == null
-			|| boardLogic == null
-			|| player1 == null
-			|| player2 == null
-			|| playerLogic == null) {
-				disc = new Disc();
-				discLogic = new DiscLogic();
-				board = new Board();
-				boardLogic = new BoardLogic();
-				player1 = new Player();
-				player2 = new Player();
-				playerLogic = new PlayerLogic();
+		String refererUrl = request.getHeader("REFERER");
+		if (refererUrl.contains("ready")) {
+			if (disc == null
+				|| discLogic == null
+				|| board == null
+				|| boardLogic == null
+				|| playerLogic == null) {
+					disc = new Disc();
+					discLogic = new DiscLogic();
+					board = new Board();
+					boardLogic = new BoardLogic();
+					playerLogic = new PlayerLogic();
+			}
+		} else if (refererUrl.contains("main")) {
+			if (disc == null
+				|| discLogic == null
+				|| boardLogic == null
+				|| playerLogic == null) {
+					disc = new Disc();
+					discLogic = new DiscLogic();
+					boardLogic = new BoardLogic();
+					playerLogic = new PlayerLogic();
+			}
 		}
 		
-		session.setAttribute("disc", disc);
-		session.setAttribute("discLogic", discLogic);
-		session.setAttribute("board", board);
-		session.setAttribute("boardLogic", boardLogic);
-		session.setAttribute("player1", player1);
-		session.setAttribute("player2", player2);
-		session.setAttribute("playerLogic", playerLogic);
-				
 		// main.jspからデータ受け取り
 		request.setCharacterEncoding("UTF8");
 		
-		// main.jspで入力された行番号/列番号を取得し、セッション格納
+		// main.jspで入力された配置コマ行番号/列番号を取得
 		String setRowNo = request.getParameter("setRowNo");
 		String setColumnNo = request.getParameter("setColumnNo");
+		board.setRowNoSet(setRowNo);
+		board.setColumnNoSet(setColumnNo);
 		
 		// 他コマ方向格納リスト初期化
 		boardLogic.initializeAllOtherDiscPos(board);
@@ -92,21 +95,16 @@ public class MainServlet extends HttpServlet {
 		if (setRowNo == null && setColumnNo == null) {
 			log("from ready.jsp");
 			
-			// プレイヤー1のターンにし、プレイヤー名とコマ色をセッション格納
+			// プレイヤー1のターンにする
 			player1.setTurn(true);
-			session.setAttribute("player1Turn", player1.isTurn());
-            session.setAttribute("playerName", (String) session.getAttribute("player1Name"));
-            session.setAttribute("discColor", (String) session.getAttribute("player1Disc"));
-            
-            System.out.println("=====" + (String) session.getAttribute("playerName") + "さん(" + (String) session.getAttribute("discColor") + ")のターン！" + "=====");
 			
 			// 盤面初期状態(1回のみ実行)
 		    boardLogic.initialize(board);
-			
-			// 初期盤面をセッション格納
-	        session.setAttribute("boardList", board.getBoardList());
-	        
-	        // リトライ
+		    
+		    // 盤面インスタンスとリトライフラグをセッション格納
+		    session.setAttribute("playerName", player1.getPlayerName());
+		    session.setAttribute("discColor", player1.getDiscColor());
+	        session.setAttribute("board", board);
 	        session.setAttribute("retryFlg", true);
 	        
 	        // main.jspへ遷移
@@ -117,8 +115,8 @@ public class MainServlet extends HttpServlet {
 			log("from main.jsp");
 			
 			// プレイヤーのターン状況取得
-			boolean player1Turn = (Boolean) session.getAttribute("player1Turn");
-	        boolean player2Turn = (Boolean) session.getAttribute("player2Turn");
+			boolean player1Turn = player1.isTurn();
+	        boolean player2Turn = player2.isTurn();
 	        
 	        // プレイヤーのターン切り替え
 	        log("retryFlg:" + (Boolean) session.getAttribute("retryFlg"));
@@ -134,37 +132,38 @@ public class MainServlet extends HttpServlet {
 	            }
 	        }
 			
-			// 切り替え後のプレイヤーのターン状況をセッション格納
-			log("player1Turn:" + player1.isTurn());
-			log("player2Turn:" + player2.isTurn());
-			session.setAttribute("player1Turn", player1.isTurn());
-			session.setAttribute("player2Turn", player2.isTurn());
+			// プレイヤーのターン状況を再取得
+			player1Turn = player1.isTurn();
+			player2Turn = player2.isTurn();
 			
-			// ターン中のプレイヤーの名前とコマを取得
-	        if ((Boolean) session.getAttribute("player1Turn")) {
-	        	session.setAttribute("playerName", (String) session.getAttribute("player1Name"));
-	            session.setAttribute("discColor", (String) session.getAttribute("player1Disc"));
-	        } else {
-	        	session.setAttribute("playerName", (String) session.getAttribute("player2Name"));
-	            session.setAttribute("discColor", (String) session.getAttribute("player2Disc"));
-	        }
-	        
-	        System.out.println("=====" + (String) session.getAttribute("playerName") + "さん(" + (String) session.getAttribute("discColor") + ")のターン！" + "=====");
+			String playerName = "";
+			String discColor = "";
+			if (player1Turn) {
+				playerName = player1.getPlayerName();
+				discColor = player1.getDiscColor();
+			} else {
+				playerName = player2.getPlayerName();
+				discColor = player2.getDiscColor();
+			}
+			
+			log("player1Turn:" + player1Turn + " " + "player2Turn:" + player2Turn);
+			log("playerName:" + playerName);
+			log("discColor:" + discColor);
 	        
 	        // main.jspで入力された行列番号をint型にキャスト
-	        log("setRowNo:" + setRowNo);
-	        log("setColumnNo:" + setColumnNo);
-	        session.setAttribute("setRowNo2int", Integer.parseInt(setRowNo));
-			session.setAttribute("setColumnNo2int", Integer.parseInt(setColumnNo));
-		
+			Integer rowNoSet2Int = Integer.parseInt(board.getRowNoSet());
+			Integer columnNoSet2Int = Integer.parseInt(board.getColumnNoSet());
+	        log("rowNoSet2Int:" + rowNoSet2Int);
+	        log("columnNoSet2Int:" + columnNoSet2Int);
+	        
 	        // 反転対象行列番号リスト初期化
 	        ArrayList<ArrayList<ArrayList<Integer>>> allOtherDiscRowNoColumnNo = new ArrayList<>();
 	        
 	        // 他色取得
-	        String otherDisc = boardLogic.getOtherDiscColor((String) session.getAttribute("discColor"));
+	        String otherDisc = boardLogic.getOtherDiscColor(discColor);
 	        
 	        // コマ配置可否チェック
-	        boolean isSetDiscFlg = boardLogic.isSetDisc(board, (int) session.getAttribute("setRowNo2int"), (int) session.getAttribute("setColumnNo2int"));
+	        boolean isSetDiscFlg = boardLogic.isSetDisc(board.getBoardList(), rowNoSet2Int, columnNoSet2Int);
 	        
 	        // 指定したマスにコマが置いてある場合は探索終了
 	        if (!isSetDiscFlg) {
@@ -174,7 +173,7 @@ public class MainServlet extends HttpServlet {
 	        }
 	        
 	        // 他コマ隣接チェック
-	        boolean isNextToOtherDiscFlg = boardLogic.isNextToOtherDisc(board, (int) session.getAttribute("setRowNo2int"), (int) session.getAttribute("setColumnNo2int"), otherDisc);
+	        boolean isNextToOtherDiscFlg = boardLogic.isNextToOtherDisc(board, rowNoSet2Int, columnNoSet2Int, otherDisc);
 	        
 	        // 他コマが隣接していない場合は探索終了
 	        if (!isNextToOtherDiscFlg) {
@@ -204,11 +203,8 @@ public class MainServlet extends HttpServlet {
 	            boolean emptyFlg = false;
 	            boolean boardOutsideFlg = false;
 	            while (!boardLogic.getSelfDiscFlg(board)) {
-	            	int rowNo = (int) session.getAttribute("setRowNo2int");
-	            	int columnNo = (int) session.getAttribute("setColumnNo2int");
-	            	
 	                // 他コマ行列番号リスト取得
-	                otherDiscRowNoColumnNo = boardLogic.addOtherDiscRowNoColumnNo(board, rowNo, columnNo, targetDiscPos, otherDisc, (String) session.getAttribute("discColor"), noCounter);
+	                otherDiscRowNoColumnNo = boardLogic.addOtherDiscRowNoColumnNo(board, rowNoSet2Int, columnNoSet2Int, targetDiscPos, otherDisc, discColor, noCounter);
 	                
 	                // 全他コマ行列番号リストに、他コマ行列番号リストを格納
 	                otherDiscRowNoColumnNoAsPos.add(otherDiscRowNoColumnNo);
@@ -251,15 +247,15 @@ public class MainServlet extends HttpServlet {
 	         	rd.forward(request, response);
 	        }
 	        
+	        // コマ配置(他コマをひっくり返す)
 	        for (ArrayList<ArrayList<Integer>> otherDiscRowNoColumnNo : allOtherDiscRowNoColumnNo) {
 	            for (ArrayList<Integer> rowNoColumnNo : otherDiscRowNoColumnNo) {
 	                if (rowNoColumnNo.size() != 0) {
 	                    int otherDiscRowNo = rowNoColumnNo.get(0);
 	                    int otherDiscColumnNo = rowNoColumnNo.get(1);
 	                    
-	                    // コマ配置(他コマをひっくり返す)
-	                    boardLogic.setDisc(board, (int) session.getAttribute("setRowNo2int"), (int) session.getAttribute("setColumnNo2int"), (String) session.getAttribute("discColor"));
-	                    boardLogic.setDisc(board, otherDiscRowNo, otherDiscColumnNo, (String) session.getAttribute("discColor"));
+	                    boardLogic.setDisc(board, rowNoSet2Int, columnNoSet2Int, discColor);
+	                    boardLogic.setDisc(board, otherDiscRowNo, otherDiscColumnNo, discColor);
 	                }
 	            }
 	        }
@@ -273,17 +269,17 @@ public class MainServlet extends HttpServlet {
 	        Integer whiteNum = disc.getWhiteNum();
 	        boardLogic.display(board, blackNum, whiteNum);
 	        
-	        // 次ターンのプレイヤーの名前とコマを取得
-	        // FIXME: l:143と共通化したい
-	        if ((Boolean) session.getAttribute("player1Turn")) {
-	        	session.setAttribute("playerName", (String) session.getAttribute("player2Name"));
-	            session.setAttribute("discColor", (String) session.getAttribute("player2Disc"));
+	        // 次ターンのプレイヤー名/コマをセッション格納
+	        if (player1Turn) {
+	        	session.setAttribute("playerName", player2.getPlayerName());
+	        	session.setAttribute("discColor", player2.getDiscColor());
 	        } else {
-	        	session.setAttribute("playerName", (String) session.getAttribute("player1Name"));
-	            session.setAttribute("discColor", (String) session.getAttribute("player1Disc"));
+	        	session.setAttribute("playerName", player1.getPlayerName());
+	        	session.setAttribute("discColor", player1.getDiscColor());
 	        }
-			session.setAttribute("boardList", boardList);
-			
+	        
+	        // 次ターンのプレイヤーの名前とコマを取得
+			session.setAttribute("board", board);
 			session.setAttribute("retryFlg", false);
 			
 			// main.jspへ遷移

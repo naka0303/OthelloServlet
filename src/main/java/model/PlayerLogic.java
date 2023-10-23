@@ -12,10 +12,6 @@ public class PlayerLogic {
         String playerName = scan.nextLine();
         
         player.setPlayerName(playerName);
-        // player.setDiscColor("W");
         player.setTurn(false);
-        // player2.setPlayerName(player2Name);
-        // player2.setDiscColor("B");
-        // player2.setTurn(false);
     }
 }

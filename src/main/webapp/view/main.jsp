@@ -1,10 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" import="model.Board, model.Player"%>
 <%
 // セッションからのデータの取得
-String[][] boardList = (String[][]) session.getAttribute("boardList");
+Board board = (Board) session.getAttribute("board");
 String playerName = (String) session.getAttribute("playerName");
 String discColor = (String) session.getAttribute("discColor");
+
+String[][] boardList = board.getBoardList();
+
+System.out.println("=====" + playerName + "さん(" + discColor + ")のターン！" + "=====");
 %>
     
 <!DOCTYPE html>

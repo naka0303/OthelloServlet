@@ -96,9 +96,7 @@ public class BoardLogic {
      * @param rowNo
      * @param columnNo
      */
-    public boolean isSetDisc(Board board, int rowNo, int columnNo) {
-    	String[][] boardList = board.getBoardList();
-    	
+    public boolean isSetDisc(String[][] boardList, int rowNo, int columnNo) {
         if (!boardList[rowNo][columnNo].equals("-")) {
             return false;
         }

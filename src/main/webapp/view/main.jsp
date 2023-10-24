@@ -21,28 +21,23 @@ System.out.println("=====" + playerName + "さん(" + discColor + ")のターン
 	<body>
 		<p><%= playerName %>さんのターン！</p>
 		<p><%= discColor %>を置いてください</p>
-		<p>1&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;8</p>
+		<p>1&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8</p>
+		<% int cnt = 1; %>
 		<table>
-			<% int cnt = 1; %>
-			<% for (String[] disc : boardList) { %>
-				<tr>
-				<% for (String d : disc) { %>
-					<% if (d != null) { %>
-		 				<td><%= d %></td>
-		 				<td></td>
-		 				<td></td>
-		 				<td></td>
-		 			<% } %>
-		 		<% } %>
-		 		<% if (cnt - 1 >= 1) { %>
-		 			<td><%= cnt - 1 %></td>
-		 			<td></td>
-		 			<td></td>
-		 			<td></td>
-		 		<% } %>
-		 		</tr>
-                <%= cnt++ %>
-            <% } %>
+		<% for (int i = 1; i <= 8; i++) { %>
+			<tr>
+			<% for (int j = 1; j <= 8; j++) { %>
+				<td><%= boardList[i][j] %>&nbsp;&nbsp;</td>
+		 		<td></td>
+		 		<td></td>
+		 		<td></td>
+		 	<% } %>
+		 		<td><%= cnt++ %></td>
+		 		<td></td>
+		 		<td></td>
+		 		<td></td>
+		 	</tr>
+        <% } %>
 		</table>
 		<form action="<%= request.getContextPath() %>/main" name="discSetForm" method="post">
 			<p>コマを配置したい行番号を入力してください。</p>

@@ -1,6 +1,11 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -36,7 +41,7 @@ public class MainServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 	}
 
 	/**
@@ -82,17 +87,56 @@ public class MainServlet extends HttpServlet {
 		// main.jspからデータ受け取り
 		request.setCharacterEncoding("UTF8");
 		
-		// main.jspで入力された配置コマ行番号/列番号を取得
-		String setRowNo = request.getParameter("setRowNo");
-		String setColumnNo = request.getParameter("setColumnNo");
-		board.setRowNoSet(setRowNo);
-		board.setColumnNoSet(setColumnNo);
+		// TODO: 外部ファイルに移動させる
+		String url = "jdbc:postgresql://localhost:5432/othelloservlet";
+		String user = "postgres";
+		String password = "admin";
+				
+		try {
+			Class.forName("org.postgresql.Driver");
+			Connection conn = DriverManager.getConnection(url, user, password);
+					
+			String sql = "SELECT * FROM boardList_elements";
+			PreparedStatement ps = conn.prepareStatement(sql);
+					
+			ResultSet rs = ps.executeQuery();
+					
+			while (rs.next()) {
+				Integer id = rs.getInt("id");
+				String image_name = rs.getString("image_name");
+				String image_path = rs.getString("image_path");
+				
+				if (id == 1) {
+					session.setAttribute("black_disc_image_path", image_path);
+				} else if (id == 2) {
+					session.setAttribute("white_disc_image_path", image_path);
+				} else if (id == 3) {
+					session.setAttribute("board_image_path", image_path);
+				}
+			}
+		} catch (SQLException | ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		
+		// main.jspで選択された配置コマ行番号/列番号を取得
+		String setRowColumnNo = request.getParameter("board");
+		String setRowNo = "";
+		String setColumnNo = "";
+		if (setRowColumnNo != null) {
+			String[] setRowColumnNoSplitted = setRowColumnNo.split(",");
+			setRowNo = setRowColumnNoSplitted[0];
+			setColumnNo = setRowColumnNoSplitted[1];
+			board.setRowNoSet(setRowNo);
+			board.setColumnNoSet(setColumnNo);
+		}
 		
 		// 他コマ方向格納リスト初期化
 		boardLogic.initializeAllOtherDiscPos(board);
 		
 		// ready.jspから遷移してきた場合とそれ以外で処理を変える
-		if (setRowNo == null && setColumnNo == null) {
+		// TODO: (4,7)にコマを配置するとnullエラー発生する
+		if (setRowNo == "" && setColumnNo == "") {
 			log("from ready.jsp");
 			
 			// プレイヤー1のターンにする

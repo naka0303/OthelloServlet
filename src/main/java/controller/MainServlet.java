@@ -135,7 +135,7 @@ public class MainServlet extends HttpServlet {
 		boardLogic.initializeAllOtherDiscPos(board);
 		
 		// ready.jspから遷移してきた場合とそれ以外で処理を変える
-		// TODO: (4,7)にコマを配置するとnullエラー発生する
+		// TODO: 2列目(7列目)にコマを配置し、1列目(8列目)に他コマが隣接しているとnullPointerException発生
 		if (setRowNo == "" && setColumnNo == "") {
 			log("from ready.jsp");
 			
@@ -145,7 +145,12 @@ public class MainServlet extends HttpServlet {
 			// 盤面初期状態(1回のみ実行)
 		    boardLogic.initialize(board);
 		    
+		    // コマ数算出
+	        String[][] boardList = board.getBoardList();
+	        discLogic.calcDiscNum(disc, boardList);
+		    
 		    // 盤面インスタンスとリトライフラグをセッション格納
+		    session.setAttribute("disc", disc);
 		    session.setAttribute("playerName", player1.getPlayerName());
 		    session.setAttribute("discColor", player1.getDiscColor());
 	        session.setAttribute("board", board);
@@ -325,6 +330,8 @@ public class MainServlet extends HttpServlet {
 	        // 次ターンのプレイヤーの名前とコマを取得
 			session.setAttribute("board", board);
 			session.setAttribute("retryFlg", false);
+			
+			session.setAttribute("disc", disc);
 			
 			// main.jspへ遷移
 			log("forward to main.jsp");

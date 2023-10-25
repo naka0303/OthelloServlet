@@ -1,8 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8" import="model.Board, model.Player"%>
+    pageEncoding="UTF-8" import="model.Board, model.Player, model.Disc"%>
 <%
 // セッションからのデータの取得
 Board board = (Board) session.getAttribute("board");
+Disc disc = (Disc) session.getAttribute("disc");
 String playerName = (String) session.getAttribute("playerName");
 String discColor = (String) session.getAttribute("discColor");
 String black_disc_image_path = (String) session.getAttribute("black_disc_image_path");
@@ -28,6 +29,8 @@ System.out.println("=====" + playerName + "さん(" + discColor + ")のターン
 		<% } else if (discColor == "W") { %>
 			<p><img class="white_disc">を置いてください</p>
 		<% } %>
+		<p>戦況</p>
+		<p>黒コマ：<%= disc.getBlackNum() %>&nbsp;&nbsp;白コマ：<%= disc.getWhiteNum() %></p>
 		<p>&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8</p>
 		<% int cnt = 1; %>
 		<form action="<%= request.getContextPath() %>/main" name="discSetForm" method="post">

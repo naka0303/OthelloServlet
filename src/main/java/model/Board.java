@@ -41,6 +41,11 @@ public class Board {
      * 
      */
     private boolean boardOutsideFlg = false;
+    
+    /**
+     * 勝敗判定フラグ
+     */
+    private boolean judgeGameFinishFlg = false;
 
     // getter/setter
 	public String[][] getBoardList() {
@@ -121,5 +126,13 @@ public class Board {
 
 	public void setBoardOutsideFlg(boolean boardOutsideFlg) {
 		this.boardOutsideFlg = boardOutsideFlg;
+	}
+	
+	public boolean isJudgeGameFinishFlg() {
+		return judgeGameFinishFlg;
+	}
+
+	public void setJudgeGameFinishFlg(boolean judgeGameFinishFlg) {
+		this.judgeGameFinishFlg = judgeGameFinishFlg;
 	}
 }

@@ -354,12 +354,17 @@ public class BoardLogic {
     	board.setAllOtherDiscPos(new ArrayList<>());
     }
 
+    /**
+     * ゲーム終了判定
+     * @param blackNum
+     * @param whiteNum
+     * @return
+     */
     public boolean judgeGameFinish(Integer blackNum, Integer whiteNum) {
-        // ゲーム終了判定
-        if (blackNum + whiteNum != 64) {
-            return false;
+        if (blackNum + whiteNum != 64
+        	&& blackNum * whiteNum != 0) {
+        		return false;
         }
-
         return true;
     }
 }

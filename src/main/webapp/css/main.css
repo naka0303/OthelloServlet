@@ -1,17 +1,15 @@
 .board {
 	background: url(../img/board.jpeg);
 	width: 41px;
-	height: 41px;
+	height: 42px;
 }
 
 .black_disc {
-	background: url(../img/black_disc.jpeg);
 	width: 41px;
 	height: 41px;
 }
 
 .white_disc {
-	background: url(../img/white_disc.jpeg);
 	width: 41px;
 	height: 41px;
 }

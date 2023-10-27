@@ -92,6 +92,8 @@ public class MainServlet extends HttpServlet {
 		String user = "postgres";
 		String password = "admin";
 				
+		// FIXME: main.jspに入ると毎回DB問い合わせをしてしまう
+		//        1回だけにするようにしたい
 		try {
 			Class.forName("org.postgresql.Driver");
 			Connection conn = DriverManager.getConnection(url, user, password);
@@ -103,7 +105,6 @@ public class MainServlet extends HttpServlet {
 					
 			while (rs.next()) {
 				Integer id = rs.getInt("id");
-				String image_name = rs.getString("image_name");
 				String image_path = rs.getString("image_path");
 				
 				if (id == 1) {
@@ -115,11 +116,29 @@ public class MainServlet extends HttpServlet {
 				}
 			}
 		} catch (SQLException | ClassNotFoundException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 		
-		// main.jspで選択された配置コマ行番号/列番号を取得
+		// パス判定
+		String pass = request.getParameter("pass");
+		if (pass != null) {
+			log("pass-btn selected");
+			
+			// プレイヤーのターン切り替え
+			playerLogic.switchTurn(player1, player2);
+			log("player1Turn:" + player1.isTurn() + " " + "player2Turn:" + player2.isTurn());
+			
+			session.setAttribute("player1", player1);
+			session.setAttribute("player2", player2);
+			
+			// main.jspへ遷移
+         	RequestDispatcher rd = request.getRequestDispatcher("view/main.jsp");
+         	rd.forward(request, response);
+			
+			return;
+		}
+		
+		// main.jspでクリックされたマスの行番号/列番号を取得
 		String setRowColumnNo = request.getParameter("board");
 		String setRowNo = "";
 		String setColumnNo = "";
@@ -135,7 +154,6 @@ public class MainServlet extends HttpServlet {
 		boardLogic.initializeAllOtherDiscPos(board);
 		
 		// ready.jspから遷移してきた場合とそれ以外で処理を変える
-		// TODO: 2列目(7列目)にコマを配置し、1列目(8列目)に他コマが隣接しているとnullPointerException発生
 		if (setRowNo == "" && setColumnNo == "") {
 			log("from ready.jsp");
 			
@@ -151,10 +169,10 @@ public class MainServlet extends HttpServlet {
 		    
 		    // 盤面インスタンスとリトライフラグをセッション格納
 		    session.setAttribute("disc", disc);
-		    session.setAttribute("playerName", player1.getPlayerName());
-		    session.setAttribute("discColor", player1.getDiscColor());
 	        session.setAttribute("board", board);
-	        session.setAttribute("retryFlg", true);
+	        session.setAttribute("player1", player1);
+	        session.setAttribute("player2", player2);
+	        session.setAttribute("retryFlg", false);
 	        
 	        // main.jspへ遷移
 	        log("forward to main.jsp");
@@ -164,41 +182,20 @@ public class MainServlet extends HttpServlet {
 			log("from main.jsp");
 			
 			// プレイヤーのターン状況取得
-			boolean player1Turn = player1.isTurn();
-	        boolean player2Turn = player2.isTurn();
-	        
-	        // プレイヤーのターン切り替え
-	        log("retryFlg:" + (Boolean) session.getAttribute("retryFlg"));
-			if (!(Boolean) session.getAttribute("retryFlg")) {
-	            if (!player1Turn && !player2Turn) {
-	                player1.setTurn(true);
-	            } else if (player1Turn && !player2Turn) {
-	                player1.setTurn(false);
-	                player2.setTurn(true);
-	            } else if (!player1Turn && player2Turn) {
-	                player1.setTurn(true);
-	                player2.setTurn(false);
-	            }
+	     	boolean player1Turn = player1.isTurn();
+	     	boolean player2Turn = player2.isTurn();
+	     	
+	     	log("player1Turn:" + player1Turn + " " + "player2Turn:" + player2Turn);
+	     	
+	     	Player playerTurned;
+	        if (player1Turn) {
+	        	playerTurned = player1;
+	        } else {
+	        	playerTurned = player2;
 	        }
-			
-			// プレイヤーのターン状況を再取得
-			player1Turn = player1.isTurn();
-			player2Turn = player2.isTurn();
-			
-			String playerName = "";
-			String discColor = "";
-			if (player1Turn) {
-				playerName = player1.getPlayerName();
-				discColor = player1.getDiscColor();
-			} else {
-				playerName = player2.getPlayerName();
-				discColor = player2.getDiscColor();
-			}
-			
-			log("player1Turn:" + player1Turn + " " + "player2Turn:" + player2Turn);
-			log("playerName:" + playerName);
-			log("discColor:" + discColor);
 	        
+	        String discColor = playerTurned.getDiscColor();
+	     	
 	        // main.jspで入力された行列番号をint型にキャスト
 			Integer rowNoSet2Int = Integer.parseInt(board.getRowNoSet());
 			Integer columnNoSet2Int = Integer.parseInt(board.getColumnNoSet());
@@ -211,16 +208,6 @@ public class MainServlet extends HttpServlet {
 	        // 他色取得
 	        String otherDisc = boardLogic.getOtherDiscColor(discColor);
 	        
-	        // コマ配置可否チェック
-	        boolean isSetDiscFlg = boardLogic.isSetDisc(board.getBoardList(), rowNoSet2Int, columnNoSet2Int);
-	        
-	        // 指定したマスにコマが置いてある場合は探索終了
-	        if (!isSetDiscFlg) {
-	            System.out.println("指定したマスには既にコマが配置されています。");
-	
-	            session.setAttribute("retryFlg", true);
-	        }
-	        
 	        // 他コマ隣接チェック
 	        boolean isNextToOtherDiscFlg = boardLogic.isNextToOtherDisc(board, rowNoSet2Int, columnNoSet2Int, otherDisc);
 	        
@@ -229,6 +216,12 @@ public class MainServlet extends HttpServlet {
 	            System.out.println("引っくり返せるコマがありません。");
 	
 	            session.setAttribute("retryFlg", true);
+	            
+	            // main.jspへ遷移
+	         	RequestDispatcher rd = request.getRequestDispatcher("view/main.jsp");
+	         	rd.forward(request, response);
+	            
+	            return;
 	        }
 	        
 	        // 他コマ方向格納リスト取得
@@ -294,6 +287,8 @@ public class MainServlet extends HttpServlet {
 	            // main.jspへ遷移
 	         	RequestDispatcher rd = request.getRequestDispatcher("view/main.jsp");
 	         	rd.forward(request, response);
+	         	
+	         	return;
 	        }
 	        
 	        // コマ配置(他コマをひっくり返す)
@@ -316,22 +311,35 @@ public class MainServlet extends HttpServlet {
 	        // オセロ盤面表示
 	        Integer blackNum = disc.getBlackNum();
 	        Integer whiteNum = disc.getWhiteNum();
+	        log("blackNum:" + blackNum + " " + "whiteNum:" + whiteNum);
 	        boardLogic.display(board, blackNum, whiteNum);
-	        
-	        // 次ターンのプレイヤー名/コマをセッション格納
-	        if (player1Turn) {
-	        	session.setAttribute("playerName", player2.getPlayerName());
-	        	session.setAttribute("discColor", player2.getDiscColor());
-	        } else {
-	        	session.setAttribute("playerName", player1.getPlayerName());
-	        	session.setAttribute("discColor", player1.getDiscColor());
-	        }
-	        
-	        // 次ターンのプレイヤーの名前とコマを取得
-			session.setAttribute("board", board);
-			session.setAttribute("retryFlg", false);
+	     	        
+	     	// プレイヤーのターン切り替え
+	     	log("retryFlg:" + (Boolean) session.getAttribute("retryFlg"));
+	     	if (!(Boolean) session.getAttribute("retryFlg")) {
+	     		playerLogic.switchTurn(player1, player2);
+	     	}
+	     	log("player1Turn:" + player1.isTurn() + " " + "player2Turn:" + player2.isTurn());
 			
+			// 勝敗判定
+			boolean judgeGameFinishFlg = boardLogic.judgeGameFinish(blackNum, whiteNum);
+			log("judgeGameFinishFlg:" + judgeGameFinishFlg);
+			if (judgeGameFinishFlg) {
+				if (whiteNum > blackNum) {
+					log("Winner is" + " " + player1.getPlayerName() + "!!");
+					player1.setResultFlg(true);
+				} else {
+					log("Winner is" + " " + player2.getPlayerName() + "!!");
+					player2.setResultFlg(true);
+				}
+			}
+			
+			// 盤面インスタンス、コマインスタンスをセッション格納
+			session.setAttribute("board", board);
 			session.setAttribute("disc", disc);
+			session.setAttribute("player1", player1);
+			session.setAttribute("player2", player2);
+			session.setAttribute("retryFlg", false);
 			
 			// main.jspへ遷移
 			log("forward to main.jsp");

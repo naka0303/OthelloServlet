@@ -56,11 +56,11 @@ public class ReadyServlet extends HttpServlet {
 		// プレイヤー1とプレイヤー2の、プレイヤー名/コマ/ターンをセット
 		String player1Name = request.getParameter("player1Name");
 		player1.setPlayerName(player1Name);
-	    player1.setDiscColor("W");
+	    player1.setDiscColor("B");
 	    player1.setTurn(false);
 	    String player2Name = request.getParameter("player2Name");
 	    player2.setPlayerName(player2Name);
-	    player2.setDiscColor("B");
+	    player2.setDiscColor("W");
 	    player2.setTurn(false);
 	    
 	    // プレイヤー1とプレイヤー2のインスタンスをセッション格納

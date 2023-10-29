@@ -40,8 +40,6 @@ public class BoardLogic {
         setDisc(board, 5, 4, "W");
         setDisc(board, 5, 5, "B");
         
-        
-
         // コンソールに盤面表示
         display(board, 2, 2);
     }

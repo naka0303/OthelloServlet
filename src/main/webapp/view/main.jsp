@@ -6,9 +6,8 @@ Board board = (Board) session.getAttribute("board");
 Disc disc = (Disc) session.getAttribute("disc");
 Player player1 = (Player) session.getAttribute("player1");
 Player player2 = (Player) session.getAttribute("player2");
-String blackDiscImagePath = (String) session.getAttribute("black_disc_image_path");
-String whiteDiscImagePath = (String) session.getAttribute("white_disc_image_path");
-String boardImagePath = (String) session.getAttribute("board_image_path");
+String blackDiscImgPath = (String) session.getAttribute("blackDiscImgPath");
+String whiteDiscImgPath = (String) session.getAttribute("whiteDiscImgPath");
 
 Player playerTurned;
 if (player1.isTurn()) {
@@ -32,9 +31,9 @@ System.out.println("=====" + playerTurned.getPlayerName() + "さん(" + playerTu
 	<body>
 		<p><%= playerTurned.getPlayerName() %>さんのターン！</p>
 		<% if (playerTurned.getDiscColor() == "B") { %>
-			<p><img src="<%= request.getContextPath() %><%= blackDiscImagePath %>" class="black_disc" alt="黒コマ">を置いてください</p>
+			<p><img src="<%= request.getContextPath() %><%= blackDiscImgPath %>" class="black_disc" alt="黒コマ">を置いてください</p>
 		<% } else if (playerTurned.getDiscColor() == "W") { %>
-			<p><img src="<%= request.getContextPath() %><%= whiteDiscImagePath %>" class="white_disc" alt="白コマ">を置いてください</p>
+			<p><img src="<%= request.getContextPath() %><%= whiteDiscImgPath %>" class="white_disc" alt="白コマ">を置いてください</p>
 		<% } %>
 		<p>戦況</p>
 		<p>黒コマ：<%= disc.getBlackNum() %>&nbsp;&nbsp;白コマ：<%= disc.getWhiteNum() %></p>
@@ -54,9 +53,9 @@ System.out.println("=====" + playerTurned.getPlayerName() + "さん(" + playerTu
 						<td><input type="submit" class="board" name="board" value="<%= i %>,<%= j %>" alt="盤面マス"></td>
 					</form>
 				<% } else if (boardList[i][j] == "B") { %>
-					<td><img src="<%= request.getContextPath() %><%= blackDiscImagePath %>" class="black_disc" alt="黒コマ"></td>
+					<td><img src="<%= request.getContextPath() %><%= blackDiscImgPath %>" class="black_disc" alt="黒コマ"></td>
 				<% } else if (boardList[i][j] == "W") { %>
-					<td><img src="<%= request.getContextPath() %><%= whiteDiscImagePath %>" class="white_disc" alt="白コマ"></td>
+					<td><img src="<%= request.getContextPath() %><%= whiteDiscImgPath %>" class="white_disc" alt="白コマ"></td>
 				<% } %>
 			<% } %>
 				<td><%= cnt++ %></td>

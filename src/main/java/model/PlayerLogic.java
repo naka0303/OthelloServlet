@@ -7,8 +7,7 @@ public class PlayerLogic {
      */
     public void initialize(Player player) {
     	Scanner scan = new Scanner(System.in);
-    	// プレイヤー名/コマ色設定
-        System.out.println("プレイヤーの名前を入力してください");
+    	// プレイヤー名設定
         String playerName = scan.nextLine();
         
         player.setPlayerName(playerName);

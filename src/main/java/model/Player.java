@@ -14,7 +14,7 @@ public class Player {
     /**
      * パス判定
      */
-    private boolean pass;
+    private boolean resultFlg;
 
     /**
      * ターン判定
@@ -38,12 +38,12 @@ public class Player {
 		this.discColor = discColor;
 	}
 
-	public boolean isPass() {
-		return pass;
+	public boolean isResultFlg() {
+		return resultFlg;
 	}
 
-	public void setPass(boolean pass) {
-		this.pass = pass;
+	public void setResultFlg(boolean resultFlg) {
+		this.resultFlg = resultFlg;
 	}
 
 	public boolean isTurn() {

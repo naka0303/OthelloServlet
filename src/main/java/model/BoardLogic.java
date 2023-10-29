@@ -39,7 +39,7 @@ public class BoardLogic {
         setDisc(board, 4, 5, "W");
         setDisc(board, 5, 4, "W");
         setDisc(board, 5, 5, "B");
-
+        
         // コンソールに盤面表示
         display(board, 2, 2);
     }
@@ -182,7 +182,12 @@ public class BoardLogic {
     private void seekOtherDisc(Board board, int seekDiscRowNo, int seekDiscColumnNo, String otherDisc, String selfDisc) {
     	String[][] boardList = board.getBoardList();
     	
-    	if (boardList[seekDiscRowNo][seekDiscColumnNo].equals(otherDisc)) {
+    	if (seekDiscRowNo <= 0 || seekDiscRowNo >= 9
+    		|| seekDiscColumnNo <= 0 || seekDiscColumnNo >= 9) {
+		     	 board.setSelfDiscFlg(false);
+		         board.setEmptyFlg(false);
+		         board.setBoardOutsideFlg(true);
+        } else if (boardList[seekDiscRowNo][seekDiscColumnNo].equals(otherDisc)) {
     		board.setSelfDiscFlg(false);
             board.setEmptyFlg(false);
             board.setBoardOutsideFlg(false);
@@ -194,11 +199,6 @@ public class BoardLogic {
         	board.setSelfDiscFlg(false);
             board.setEmptyFlg(true);
             board.setBoardOutsideFlg(false);
-        } else if (seekDiscRowNo >= 1 && seekDiscRowNo <= 8
-                   || seekDiscColumnNo >= 1 && seekDiscColumnNo <= 8) {
-        	board.setSelfDiscFlg(false);
-            board.setEmptyFlg(false);
-            board.setBoardOutsideFlg(true);
         }
     }
 
@@ -267,6 +267,7 @@ public class BoardLogic {
         int seekDiscColumnNo = board.getSeekDiscColumnNo();
 
         // 他コマ探索
+        System.out.println(seekDiscRowNo + " " + seekDiscColumnNo);
         seekOtherDisc(board, seekDiscRowNo, seekDiscColumnNo, otherDisc, selfDisc);
 
         otherDiscRowNoColumnNo.add(seekDiscRowNo);
@@ -351,12 +352,17 @@ public class BoardLogic {
     	board.setAllOtherDiscPos(new ArrayList<>());
     }
 
+    /**
+     * ゲーム終了判定
+     * @param blackNum
+     * @param whiteNum
+     * @return
+     */
     public boolean judgeGameFinish(Integer blackNum, Integer whiteNum) {
-        // ゲーム終了判定
-        if (blackNum + whiteNum != 64) {
-            return false;
+        if (blackNum + whiteNum != 64
+        	&& blackNum * whiteNum != 0) {
+        		return false;
         }
-
         return true;
     }
 }
